@@ -1,0 +1,249 @@
+// 统一存储适配器
+// 根据 USE_SUPABASE 配置，自动选择使用 localStorage 还是 Supabase
+import { USE_SUPABASE } from './storage-config';
+import * as localStorageOps from './storage';
+import * as supabaseStorageOps from './supabase-storage';
+import { getCurrentUser } from './auth';
+import { Novel, Chapter, Character, WorldSetting } from './types';
+
+// =====================================================
+// 用户操作
+// =====================================================
+
+export const createOrGetUser = async (username: string) => {
+  if (USE_SUPABASE) {
+    return supabaseStorageOps.createOrGetUser(username);
+  }
+  // localStorage 模式不需要此函数
+  throw new Error('localStorage 模式不支持 createOrGetUser');
+};
+
+// =====================================================
+// 小说操作
+// =====================================================
+
+export const getAllNovels = async (): Promise<Novel[]> => {
+  const currentUser = getCurrentUser();
+  if (!currentUser) {
+    return [];
+  }
+
+  if (USE_SUPABASE) {
+    return supabaseStorageOps.getAllNovels(currentUser.id);
+  } else {
+    return localStorageOps.getAllNovels();
+  }
+};
+
+export const getNovelById = async (novelId: string): Promise<Novel | undefined> => {
+  const currentUser = getCurrentUser();
+  if (!currentUser) {
+    return undefined;
+  }
+
+  if (USE_SUPABASE) {
+    return supabaseStorageOps.getNovelById(novelId, currentUser.id);
+  } else {
+    return localStorageOps.getNovelById(novelId);
+  }
+};
+
+export const createNovel = async (
+  title: string,
+  description: string,
+  genre: string
+): Promise<Novel> => {
+  const currentUser = getCurrentUser();
+  if (!currentUser) {
+    throw new Error('用户未登录');
+  }
+
+  if (USE_SUPABASE) {
+    return supabaseStorageOps.createNovel(currentUser.id, title, description, genre);
+  } else {
+    return localStorageOps.createNovel(title, description, genre);
+  }
+};
+
+export const saveNovel = async (novel: Novel): Promise<void> => {
+  if (USE_SUPABASE) {
+    return supabaseStorageOps.updateNovel(novel);
+  } else {
+    return localStorageOps.saveNovel(novel);
+  }
+};
+
+export const deleteNovel = async (novelId: string): Promise<void> => {
+  const currentUser = getCurrentUser();
+  if (!currentUser) {
+    return;
+  }
+
+  if (USE_SUPABASE) {
+    return supabaseStorageOps.deleteNovel(novelId, currentUser.id);
+  } else {
+    return localStorageOps.deleteNovel(novelId);
+  }
+};
+
+// =====================================================
+// 章节操作
+// =====================================================
+
+export const getChaptersByNovelId = async (novelId: string): Promise<Chapter[]> => {
+  if (USE_SUPABASE) {
+    return supabaseStorageOps.getChaptersByNovelId(novelId);
+  } else {
+    const novel = localStorageOps.getNovelById(novelId);
+    return novel?.chapters || [];
+  }
+};
+
+export const addChapter = async (
+  novelId: string,
+  chapterData: { title: string; order?: number }
+): Promise<Chapter> => {
+  if (USE_SUPABASE) {
+    const chapters = await getChaptersByNovelId(novelId);
+    const order = chapterData.order !== undefined ? chapterData.order : chapters.length;
+    return supabaseStorageOps.createChapter(novelId, chapterData.title, order);
+  } else {
+    // localStorage 需要创建一个完整的 Chapter 对象
+    const character: Chapter = {
+      id: '',
+      novelId,
+      title: chapterData.title,
+      content: '',
+      order: chapterData.order || 0,
+      status: 'draft',
+      version: 1,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    localStorageOps.addChapter(novelId, character);
+    return character;
+  }
+};
+
+export const updateChapter = async (chapter: Chapter): Promise<void> => {
+  if (USE_SUPABASE) {
+    return supabaseStorageOps.updateChapter(chapter);
+  } else {
+    return localStorageOps.updateChapter(chapter);
+  }
+};
+
+export const deleteChapter = async (chapterId: string): Promise<void> => {
+  if (USE_SUPABASE) {
+    return supabaseStorageOps.deleteChapter(chapterId);
+  } else {
+    return localStorageOps.deleteChapter(chapterId);
+  }
+};
+
+// =====================================================
+// 角色操作
+// =====================================================
+
+export const getCharactersByNovelId = async (novelId: string): Promise<Character[]> => {
+  if (USE_SUPABASE) {
+    return supabaseStorageOps.getCharactersByNovelId(novelId);
+  } else {
+    const novel = localStorageOps.getNovelById(novelId);
+    return novel?.characters || [];
+  }
+};
+
+export const addCharacter = async (novelId: string, character: Character): Promise<void> => {
+  if (USE_SUPABASE) {
+    return supabaseStorageOps.createCharacter(novelId, character);
+  } else {
+    return localStorageOps.addCharacter(novelId, character);
+  }
+};
+
+export const updateCharacter = async (character: Character, novelId: string): Promise<void> => {
+  if (USE_SUPABASE) {
+    return supabaseStorageOps.updateCharacter(character, novelId);
+  } else {
+    return localStorageOps.updateCharacter(character, novelId);
+  }
+};
+
+export const deleteCharacter = async (characterId: string): Promise<void> => {
+  if (USE_SUPABASE) {
+    return supabaseStorageOps.deleteCharacter(characterId);
+  } else {
+    return localStorageOps.deleteCharacter(characterId);
+  }
+};
+
+// =====================================================
+// 世界观设定操作
+// =====================================================
+
+export const getWorldSettingsByNovelId = async (novelId: string): Promise<WorldSetting[]> => {
+  if (USE_SUPABASE) {
+    return supabaseStorageOps.getWorldSettingsByNovelId(novelId);
+  } else {
+    const novel = localStorageOps.getNovelById(novelId);
+    return novel?.worldSettings || [];
+  }
+};
+
+export const addWorldSetting = async (novelId: string, setting: WorldSetting): Promise<void> => {
+  if (USE_SUPABASE) {
+    return supabaseStorageOps.createWorldSetting(novelId, setting);
+  } else {
+    return localStorageOps.addWorldSetting(novelId, setting);
+  }
+};
+
+export const updateWorldSetting = async (setting: WorldSetting, novelId: string): Promise<void> => {
+  if (USE_SUPABASE) {
+    return supabaseStorageOps.updateWorldSetting(setting, novelId);
+  } else {
+    return localStorageOps.updateWorldSetting(setting, novelId);
+  }
+};
+
+export const deleteWorldSetting = async (settingId: string): Promise<void> => {
+  if (USE_SUPABASE) {
+    return supabaseStorageOps.deleteWorldSetting(settingId);
+  } else {
+    return localStorageOps.deleteWorldSetting(settingId);
+  }
+};
+
+// =====================================================
+// 数据迁移功能
+// =====================================================
+
+export const migrateLocalStorageToSupabase = async (localStorageNovels: any[]): Promise<void> => {
+  const currentUser = getCurrentUser();
+  if (!currentUser) {
+    throw new Error('用户未登录');
+  }
+
+  return supabaseStorageOps.migrateLocalStorageToSupabase(currentUser.id, localStorageNovels);
+};
+
+// =====================================================
+// 导出所有类型和辅助函数
+// =====================================================
+
+export type { Novel, Chapter, Character, WorldSetting } from './types';
+
+export {
+  getStorageStats,
+  exportAllData,
+  exportNovel,
+  importData,
+  createBackup,
+  getBackups,
+  restoreBackup,
+  deleteBackup,
+  clearAllData,
+  validateDataIntegrity,
+  getMetadata,
+} from './storage';

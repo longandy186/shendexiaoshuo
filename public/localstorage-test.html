@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LocalStorage 测试</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        button {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #4f46e5;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>LocalStorage 功能测试</h1>
+    
+    <div class="test-section">
+        <h2>1. 基本读写测试</h2>
+        <button onclick="testBasicReadWrite()">测试基本读写</button>
+        <div id="basic-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. 用户数据测试</h2>
+        <button onclick="testUserData()">测试用户数据</button>
+        <div id="user-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. 小说数据测试</h2>
+        <button onclick="testNovelData()">测试小说数据</button>
+        <div id="novel-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. 清空测试数据</h2>
+        <button onclick="clearTestData()">清空测试数据</button>
+        <div id="clear-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>5. 当前localStorage内容</h2>
+        <button onclick="showAllData()">显示所有数据</button>
+        <div id="all-data"></div>
+    </div>
+
+    <script>
+        function showResult(elementId, message, isError = false) {
+            const element = document.getElementById(elementId);
+            const div = document.createElement('div');
+            div.className = isError ? 'error' : 'success';
+            div.textContent = message;
+            element.appendChild(div);
+        }
+
+        function testBasicReadWrite() {
+            try {
+                const testData = { timestamp: Date.now(), message: '测试数据' };
+                localStorage.setItem('test_basic', JSON.stringify(testData));
+                const retrieved = JSON.parse(localStorage.getItem('test_basic'));
+                
+                if (retrieved.message === '测试数据') {
+                    showResult('basic-result', '✓ 基本读写测试成功！数据: ' + JSON.stringify(retrieved));
+                } else {
+                    showResult('basic-result', '✗ 基本读写测试失败：数据不匹配', true);
+                }
+            } catch (error) {
+                showResult('basic-result', '✗ 基本读写测试失败：' + error.message, true);
+            }
+        }
+
+        function testUserData() {
+            try {
+                const user = {
+                    id: 'test-user-123',
+                    username: '测试用户',
+                    createdAt: new Date().toISOString()
+                };
+                localStorage.setItem('ai_novel_user', JSON.stringify(user));
+                const retrieved = JSON.parse(localStorage.getItem('ai_novel_user'));
+                
+                if (retrieved.username === '测试用户') {
+                    showResult('user-result', '✓ 用户数据测试成功！用户: ' + retrieved.username);
+                } else {
+                    showResult('user-result', '✗ 用户数据测试失败', true);
+                }
+            } catch (error) {
+                showResult('user-result', '✗ 用户数据测试失败：' + error.message, true);
+            }
+        }
+
+        function testNovelData() {
+            try {
+                const novel = {
+                    id: 'test-novel-456',
+                    title: '测试小说',
+                    description: '这是一个测试小说',
+                    genre: '玄幻',
+                    status: 'draft',
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    characters: [],
+                    chapters: [],
+                    worldSettings: []
+                };
+                
+                // 获取现有小说列表
+                const novels = JSON.parse(localStorage.getItem('ai_novels') || '[]');
+                novels.push(novel);
+                localStorage.setItem('ai_novels', JSON.stringify(novels));
+                
+                // 验证
+                const retrievedNovels = JSON.parse(localStorage.getItem('ai_novels'));
+                const savedNovel = retrievedNovels.find(n => n.id === 'test-novel-456');
+                
+                if (savedNovel && savedNovel.title === '测试小说') {
+                    showResult('novel-result', '✓ 小说数据测试成功！保存了 ' + retrievedNovels.length + ' 部小说');
+                } else {
+                    showResult('novel-result', '✗ 小说数据测试失败', true);
+                }
+            } catch (error) {
+                showResult('novel-result', '✗ 小说数据测试失败：' + error.message, true);
+            }
+        }
+
+        function clearTestData() {
+            try {
+                localStorage.removeItem('test_basic');
+                localStorage.removeItem('ai_novel_user');
+                localStorage.removeItem('ai_novels');
+                localStorage.removeItem('ai_novels_backups');
+                localStorage.removeItem('ai_novels_metadata');
+                showResult('clear-result', '✓ 测试数据已清空');
+            } catch (error) {
+                showResult('clear-result', '✗ 清空失败：' + error.message, true);
+            }
+        }
+
+        function showAllData() {
+            try {
+                const data = {};
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key.startsWith('ai_novel') || key === 'test_basic') {
+                        try {
+                            const value = JSON.parse(localStorage.getItem(key));
+                            data[key] = value;
+                        } catch (e) {
+                            data[key] = localStorage.getItem(key);
+                        }
+                    }
+                }
+                
+                const element = document.getElementById('all-data');
+                element.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (error) {
+                showResult('all-data', '✗ 读取失败：' + error.message, true);
+            }
+        }
+    </script>
+</body>
+</html>

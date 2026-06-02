@@ -1,0 +1,6 @@
+// 存储配置
+export const STORAGE_MODE = {
+  USE_SUPABASE: false, // 暂时禁用，待修复类型错误后启用
+};
+
+export const USE_SUPABASE = STORAGE_MODE.USE_SUPABASE;
