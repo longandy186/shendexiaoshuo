@@ -97,5 +97,9 @@
   "engines": {
     "pnpm": ">=9.0.0"
   },
-  "pnpm": {}
+  "pnpm": {
+    "overrides": {
+      "@opennextjs/cloudflare>esbuild": "0.25.4"
+    }
+  }
 }

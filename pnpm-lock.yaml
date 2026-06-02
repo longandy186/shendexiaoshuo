@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  '@opennextjs/cloudflare>esbuild': 0.25.4
+
 importers:
 
   .:
