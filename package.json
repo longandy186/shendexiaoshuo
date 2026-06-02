@@ -103,5 +103,11 @@
   },
   "overrides": {
     "esbuild": "0.25.12"
+  },
+  "pnpm": {
+    "overrides": {
+      "pg": "npm:empty-npm-package@1.0.0",
+      "pg-cloudflare": "npm:empty-npm-package@1.0.0"
+    }
   }
 }
