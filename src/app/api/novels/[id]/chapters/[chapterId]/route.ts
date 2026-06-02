@@ -89,7 +89,7 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { title, content, outline, status, order } = body;
+    const { title, content, outline, order } = body;
 
     // 构建更新数据（只更新提供的字段）
     const updateData: any = {};
@@ -99,7 +99,6 @@ export async function PUT(
       updateData.word_count = content.length;
     }
     if (outline !== undefined) updateData.outline = outline;
-    if (status !== undefined) updateData.status = status;
     if (order !== undefined) updateData.order = order;
     updateData.updated_at = new Date().toISOString();
 

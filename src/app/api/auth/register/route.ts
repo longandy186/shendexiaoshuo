@@ -112,11 +112,13 @@ export async function POST(request: NextRequest) {
     // 生成用户推荐码
     const userReferralCode = generateReferralCode();
 
-    // 判断是否为超级管理员（支持多种识别方式）
+    // 判断是否为超级管理员（从环境变量读取，可灵活配置）
     let role = 'user';
 
-    // 方式1：通过邮箱识别
-    if (email === 'longandy@163.com' || email === '13960104@qq.com') {
+    const adminEmails = (process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAILS || 'longandy@163.com,13960104@qq.com').split(',').map((s: string) => s.trim());
+    const adminUsername = process.env.NEXT_PUBLIC_SUPER_ADMIN_USERNAME || '342';
+
+    if (adminEmails.includes(email) || username === adminUsername) {
       role = 'admin';
     }
 

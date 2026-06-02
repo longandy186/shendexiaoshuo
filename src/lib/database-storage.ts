@@ -653,16 +653,18 @@ export async function dbSyncNovelToDatabase(novel: any): Promise<void> {
 /**
  * 清空数据库（慎用）
  */
-export async function dbClearDatabase(): Promise<void> {
+export async function dbClearDatabase(confirmKey?: string): Promise<void> {
+  if (confirmKey !== 'clear-all-data') {
+    console.warn('[Database] 清空数据库操作被跳过 - 需要传入确认密钥 "clear-all-data"');
+    return;
+  }
   try {
     const client = getSupabaseClient();
-
     await Promise.all([
       client.from('world_settings').delete().neq('id', '00000000-0000-0000-0000-000000000000'),
       client.from('characters').delete().neq('id', '00000000-0000-0000-0000-000000000000'),
       client.from('novels').delete().neq('id', '00000000-0000-0000-0000-000000000000'),
     ]);
-
     console.log('[Database] 数据库已清空');
   } catch (error) {
     console.error('[Database] 清空数据库失败:', error);

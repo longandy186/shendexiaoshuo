@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseClient } from '@/storage/database/supabase-client';
 import { verifyToken } from '@/utils/jwt';
 
-// 缓存配置 - 60秒
-export const revalidate = 60;
 
 /**
  * 按key对数组进行分组

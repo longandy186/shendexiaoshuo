@@ -3,8 +3,8 @@ import { getSupabaseClient } from '@/storage/database/supabase-client';
 import { generateToken } from '@/utils/jwt';
 
 // 超级管理员配置
-const SUPER_ADMIN_EMAILS = ['13960104@qq.com'];
-const SUPER_ADMIN_USERNAME = '342';
+const SUPER_ADMIN_EMAILS = (process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAILS || '13960104@qq.com').split(',').map(s => s.trim());
+const SUPER_ADMIN_USERNAME = process.env.NEXT_PUBLIC_SUPER_ADMIN_USERNAME || '342';
 
 /**
  * 统一响应格式
