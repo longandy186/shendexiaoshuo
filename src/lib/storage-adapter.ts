@@ -129,7 +129,7 @@ export const updateChapter = async (chapter: Chapter): Promise<void> => {
   if (USE_SUPABASE) {
     return supabaseStorageOps.updateChapter(chapter);
   } else {
-    return localStorageOps.updateChapter(chapter);
+    return localStorageOps.updateChapter(chapter.novelId, chapter);
   }
 };
 
@@ -137,7 +137,13 @@ export const deleteChapter = async (chapterId: string): Promise<void> => {
   if (USE_SUPABASE) {
     return supabaseStorageOps.deleteChapter(chapterId);
   } else {
-    return localStorageOps.deleteChapter(chapterId);
+    // 在 localStorage 中查找章节所属的小说
+    const novels = localStorageOps.getAllNovels();
+    for (const novel of novels) {
+      if (novel.chapters?.some(c => c.id === chapterId)) {
+        return localStorageOps.deleteChapter(novel.id, chapterId);
+      }
+    }
   }
 };
 
@@ -166,7 +172,7 @@ export const updateCharacter = async (character: Character, novelId: string): Pr
   if (USE_SUPABASE) {
     return supabaseStorageOps.updateCharacter(character, novelId);
   } else {
-    return localStorageOps.updateCharacter(character, novelId);
+    return localStorageOps.updateCharacter(novelId, character);
   }
 };
 
@@ -174,7 +180,12 @@ export const deleteCharacter = async (characterId: string): Promise<void> => {
   if (USE_SUPABASE) {
     return supabaseStorageOps.deleteCharacter(characterId);
   } else {
-    return localStorageOps.deleteCharacter(characterId);
+    const novels = localStorageOps.getAllNovels();
+    for (const novel of novels) {
+      if (novel.characters?.some(c => c.id === characterId)) {
+        return localStorageOps.deleteCharacter(novel.id, characterId);
+      }
+    }
   }
 };
 
@@ -203,7 +214,7 @@ export const updateWorldSetting = async (setting: WorldSetting, novelId: string)
   if (USE_SUPABASE) {
     return supabaseStorageOps.updateWorldSetting(setting, novelId);
   } else {
-    return localStorageOps.updateWorldSetting(setting, novelId);
+    return localStorageOps.updateWorldSetting(novelId, setting);
   }
 };
 
@@ -211,7 +222,12 @@ export const deleteWorldSetting = async (settingId: string): Promise<void> => {
   if (USE_SUPABASE) {
     return supabaseStorageOps.deleteWorldSetting(settingId);
   } else {
-    return localStorageOps.deleteWorldSetting(settingId);
+    const novels = localStorageOps.getAllNovels();
+    for (const novel of novels) {
+      if (novel.worldSettings?.some(s => s.id === settingId)) {
+        return localStorageOps.deleteWorldSetting(novel.id, settingId);
+      }
+    }
   }
 };
 
@@ -233,6 +249,9 @@ export const migrateLocalStorageToSupabase = async (localStorageNovels: any[]): 
 // =====================================================
 
 export type { Novel, Chapter, Character, WorldSetting } from './types';
+
+// 从 storage 模块重新导出类型
+export type { StorageStats, ExportData, BackupRecord } from './storage';
 
 export {
   getStorageStats,

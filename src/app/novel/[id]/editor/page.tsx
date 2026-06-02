@@ -51,7 +51,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
-import { type Novel, type Chapter } from '@/lib/storage';
+import { type Novel, type Chapter } from '@/lib/types';
 import { LANGUAGE_STYLES, getRecommendedStyles, getLanguageStyleById, type LanguageStyle } from '@/lib/language-styles';
 import { getLanguageStyles } from '@/lib/prompt-library';
 import { loadNovelFromDatabase } from '@/lib/database-api';

@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { getAllNovels, deleteNovel, type Novel } from '@/lib/storage';
+import { getAllNovels, deleteNovel, type Novel } from '@/lib/storage-adapter';
 import { useAuth } from '@/lib/auth';
 import { loadNovelsFromDatabase } from '@/lib/database-api';
 import { formatDate } from '@/lib/date-utils';
@@ -90,7 +90,7 @@ export default function NovelListPage() {
 
   const handleDelete = async () => {
     if (novelToDelete) {
-      deleteNovel(novelToDelete.id);
+      await deleteNovel(novelToDelete.id);
       await loadNovels();
       setIsDeleteDialogOpen(false);
       setNovelToDelete(null);

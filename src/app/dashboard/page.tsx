@@ -28,7 +28,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { getAllNovels, type Novel } from '@/lib/storage';
+import { getAllNovels, type Novel } from '@/lib/storage-adapter';
 import { useAuth } from '@/lib/auth';
 import { loadNovelsFromDatabase } from '@/lib/database-api';
 

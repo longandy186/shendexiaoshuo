@@ -9,13 +9,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/lib/auth';
-import { getStorageStats, exportAllData, exportNovel, importData, getAllNovels, createBackup, getBackups, restoreBackup, deleteBackup, clearAllData, validateDataIntegrity, type StorageStats, type ExportData, type BackupRecord } from '@/lib/storage';
+import { getStorageStats, exportAllData, exportNovel, importData, getAllNovels, deleteNovel, createBackup, getBackups, restoreBackup, deleteBackup, clearAllData, validateDataIntegrity, type Novel, type StorageStats, type ExportData, type BackupRecord } from '@/lib/storage-adapter';
 
 export default function DataManagementPage() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const [stats, setStats] = useState<StorageStats | null>(null);
-  const [novels, setNovels] = useState(getAllNovels());
+  const [novels, setNovels] = useState<Novel[]>([]);
   const [backups, setBackups] = useState<BackupRecord[]>([]);
   const [validationResult, setValidationResult] = useState<{ valid: boolean; errors: string[] } | null>(null);
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
@@ -37,9 +37,9 @@ export default function DataManagementPage() {
     loadBackups();
   }, []);
 
-  const loadStats = () => {
+  const loadStats = async () => {
     setStats(getStorageStats());
-    setNovels(getAllNovels());
+    setNovels(await getAllNovels());
   };
 
   const loadBackups = () => {
@@ -131,10 +131,9 @@ export default function DataManagementPage() {
     setValidationResult(result);
   };
 
-  const handleDeleteNovel = (novelId: string, title: string) => {
+  const handleDeleteNovel = async (novelId: string, title: string) => {
     if (confirm(`确定要删除小说《${title}》吗？此操作不可恢复！`)) {
-      const { deleteNovel } = require('@/lib/storage');
-      deleteNovel(novelId);
+      await deleteNovel(novelId);
       loadStats();
       alert('小说已删除');
     }

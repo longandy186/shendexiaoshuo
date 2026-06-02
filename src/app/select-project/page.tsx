@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { getAllNovels, type Novel } from '@/lib/storage';
+import { getAllNovels, type Novel } from '@/lib/storage-adapter';
 import { useAuth } from '@/lib/auth';
 import { formatDateTime } from '@/lib/date-utils';
 
@@ -34,8 +34,8 @@ export default function SelectProjectPage() {
     filterNovels();
   }, [novels, searchTerm]);
 
-  const loadNovels = () => {
-    const allNovels = getAllNovels();
+  const loadNovels = async () => {
+    const allNovels = await getAllNovels();
     const sortedNovels = allNovels.sort((a, b) => 
       new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
     );

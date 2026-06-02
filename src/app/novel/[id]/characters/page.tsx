@@ -28,7 +28,7 @@ import {
   Collapsible, CollapsibleContent, CollapsibleTrigger
 } from '@/components/ui/collapsible';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { type Novel, type Character } from '@/lib/storage';
+import { type Novel, type Character } from '@/lib/types';
 import { useAuth } from '@/lib/auth';
 import { showSaveSuccess, showError, showInfo, showWarning } from '@/lib/toast-utils';
 import { loadNovelFromDatabase } from '@/lib/database-api';

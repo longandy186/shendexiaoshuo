@@ -13,7 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/lib/auth';
 import { showSaveSuccess, showError } from '@/lib/toast-utils';
 import { loadNovelFromDatabase } from '@/lib/database-api';
-import { type Novel } from '@/lib/storage';
+import { type Novel } from '@/lib/types';
 
 interface SubPlot {
   id: string;
